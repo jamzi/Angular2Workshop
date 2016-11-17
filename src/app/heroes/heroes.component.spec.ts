@@ -10,7 +10,7 @@ describe('App: HeroTutorial', () => {
     });
   });
 
-  it('should create the app', async(() => {
+/*  it('should create the app', async(() => {
     let fixture = TestBed.createComponent(HeroesComponent);
     let app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
@@ -27,5 +27,5 @@ describe('App: HeroTutorial', () => {
     fixture.detectChanges();
     let compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('h1').textContent).toContain('app works!');
-  }));
+  }));*/
 });
