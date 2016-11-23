@@ -6,6 +6,8 @@ TABLE OF CONTENTS
 * [Setting up Angular 2](#setting-up-angular-2)
 * [Introduction](#introduction)
 * [Adding more heroes](#adding-more-heroes)
+* [Multiple components](#multiple-components)
+* [Services](#services)
 
 ## SETTING UP ANGULAR 2
 ---------------------
@@ -140,4 +142,76 @@ Styling can be added to app.component.css file.
       height: 1.8em;
       margin-right: .8em;
       border-radius: 4px 0 0 4px;
+    }
+
+## MULTIPLE COMPONENTS
+---------------------
+
+Let's first extract Hero class to separate file. Create hero.ts in the /models folder.
+
+    export class Hero {
+        id: number;
+        name: string;
+    }
+
+We will also extract hero details to separate component. You can generate new component by running ng g component hero-detail from CLI.
+Add hero input to HeroDetailComponent class. Also, grab the html for displaying separate hero and paste it in the hero-detail.component.html and rename selectedHero -> hero.
+
+    @Input()
+    hero: Hero;
+
+Finally, go to app.component.html and add hero-detail directive and bind hero property to selectedHero.
+
+    <app-hero-detail [hero]="selectedHero"></app-hero-detail>
+
+## SERVICES
+---------------------
+
+Create new services folder and generate hero service with ng g service services/hero. We must provide this service in app.module.ts
+
+    providers: [HeroService]
+
+Next, let's extract multiple heroes data to models/mock-heroes.ts file.
+
+    import { Hero } from './hero';
+
+    export const HEROES: Hero[] = [
+        { id: 11, name: 'Mr. Nice' },
+        { id: 12, name: 'Narco' },
+        { id: 13, name: 'Bombasto' },
+        { id: 14, name: 'Celeritas' },
+        { id: 15, name: 'Magneta' },
+        { id: 16, name: 'RubberMan' },
+        { id: 17, name: 'Dynama' },
+        { id: 18, name: 'Dr IQ' },
+        { id: 19, name: 'Magma' },
+        { id: 20, name: 'Tornado' }
+    ];
+
+Now go to hero.service.ts and add getHeroes method which returns a promise.
+
+    getHeroes(): Promise<Hero[]> {
+        return Promise.resolve(HEROES);
+    }
+
+Let's go to app.component.ts and consume this service.
+
+    export class AppComponent implements OnInit{
+        title = 'Tour of Heroes';
+        heroes = HEROES;
+        selectedHero: Hero;
+
+        constructor(private heroService: HeroService) { }
+
+        getHeroes(): void {
+            this.heroService.getHeroes().then(heroes => this.heroes = heroes);
+        }
+
+        ngOnInit(): void {
+            this.getHeroes();
+        }
+
+        onSelect(hero: Hero): void {
+            this.selectedHero = hero;
+        }
     }
