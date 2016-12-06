@@ -215,3 +215,63 @@ Let's go to app.component.ts and consume this service.
             this.selectedHero = hero;
         }
     }
+
+## ROUTING
+---------------------
+
+Rename app.component.* to heroes.component.* and move these files in /heroes folder. In heroes.component.ts change name HeroesComponent and fix imports (path should be one more folder back). Then navigate to app.module.ts and rename app -> heroes and fix paths.
+
+Create new AppComponent with ng g component app in the /app folder. Move files from /app/app to /app and fix the app.module.ts path for app.component.ts.
+
+Let's create separate module for routing in the app/routing.module.ts. Open app.module.ts and add routing module to imports array and copy content below to routing.module.ts.
+
+    import { NgModule } from '@angular/core';
+    import { RouterModule, Routes } from '@angular/router';
+    import { DashboardComponent } from './dashboard/dashboard.component';
+    import { HeroesComponent } from './heroes/heroes.component';
+    import { HeroDetailComponent } from './hero-detail/hero-detail.component';
+
+    const routes: Routes = [
+        { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+        { path: 'dashboard', component: DashboardComponent },
+        { path: 'detail/:id', component: HeroDetailComponent },
+        { path: 'heroes', component: HeroesComponent }
+    ];
+    @NgModule({
+        imports: [RouterModule.forRoot(routes)],
+        exports: [RouterModule]
+    })
+    export class RoutingModule { }
+
+Move the title of app in the app.component.html and add two links, to dashboard and heroes views.
+
+    <h1>{{title}}</h1>
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/heroes" routerLinkActive="active">Heroes</a>
+    </nav>
+    <router-outlet></router-outlet>
+
+Create dashboard folder in /app and generate dashboard component with ng g component dashboard and add a title to dashboard.component.html. We will also display top 5 heroes here.
+
+    <h3>My Dashboard</h3>
+    <h3>Top Heroes</h3>
+    <div class="grid grid-pad">
+        <a *ngFor="let hero of heroes" [routerLink]="['/detail', hero.id]" class="col-1-4">
+            <div class="module hero">
+                <h4>{{hero.name}}</h4>
+            </div>
+        </a>
+    </div>
+
+We will now implement logic for top heroes. Open dashboard.component.ts and add.
+
+  heroes: Hero[] = [];
+
+  constructor(private heroService: HeroService) { }
+
+  ngOnInit(): void {
+    this.heroService.getHeroes()
+      .then(heroes => this.heroes = heroes.slice(1, 5));
+  }
+
