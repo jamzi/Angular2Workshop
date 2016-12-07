@@ -8,6 +8,7 @@ TABLE OF CONTENTS
 * [Adding more heroes](#adding-more-heroes)
 * [Multiple components](#multiple-components)
 * [Services](#services)
+* [Routing](#routing)
 
 ## SETTING UP ANGULAR 2
 ---------------------
