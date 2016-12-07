@@ -266,12 +266,193 @@ Create dashboard folder in /app and generate dashboard component with ng g compo
 
 We will now implement logic for top heroes. Open dashboard.component.ts and add.
 
-  heroes: Hero[] = [];
+    heroes: Hero[] = [];
 
-  constructor(private heroService: HeroService) { }
+    constructor(private heroService: HeroService) { }
 
-  ngOnInit(): void {
-    this.heroService.getHeroes()
-      .then(heroes => this.heroes = heroes.slice(1, 5));
-  }
+    ngOnInit(): void {
+        this.heroService.getHeroes()
+            .then(heroes => this.heroes = heroes.slice(1, 5));
+    }
 
+Try to run ng serve and you should be able to navigate between two routes /dashboard, /heroes
+
+We will now set up the navigation to specific hero with passing the hero id as a number in the params. Add this to your hero-detail.component.ts
+  
+    @Input()
+    hero: Hero;
+
+We implement the ngOnInit and get the data from params on the component init.
+
+    import { HeroService } from './../services/hero.service';
+    import { Hero } from './../models/hero';
+    import { Component, Input, OnInit } from '@angular/core';
+    import { ActivatedRoute, Params } from '@angular/router';
+    import { Location } from '@angular/common';
+    import 'rxjs/add/operator/switchMap';
+
+    constructor(
+        private heroService: HeroService,
+        private route: ActivatedRoute,
+        private location: Location
+    ) { }
+
+    ngOnInit() {
+        this.route.params.switchMap((params: Params) =>
+            this.heroService.getHero(+params['id'])).subscribe(hero => this.hero = hero);
+    }
+
+We already have a method in our hero.service.ts to get all the heroes, but we need to add a method to get a specific hero, which we consume here in the ngOnInit. Add this to your hero.service.ts
+
+    getHero(id: number): Promise<Hero> {
+        return this.getHeroes().then(heroes => heroes.find(hero => hero.id === id));
+    }
+
+When we are on the hero.detail view, we want to have an option to get back to the dashboard. Let's add the back method and the button in the hero-detail component.
+
+    <div>
+        <button (click)="goBack()">Back</button>
+    </div>
+
+    goBack(): void {
+        this.location.back();
+    }
+
+We will modify heroes component too, so when you click on hero, you will be presented with a link which takes you to the hero detail component. Add this to heroes.component.html
+    
+    <div *ngIf="selectedHero">
+        <h2>
+            {{selectedHero.name | uppercase}} is my hero
+        </h2>
+        <button (click)="gotoDetail()">View Details</button>
+    </div>
+
+Let's implement gotoDetail method in heroes.component.ts
+
+    constructor(private heroService: HeroService, private router: Router) {}
+
+    gotoDetail(): void {
+        this.router.navigate(['/detail', this.selectedHero.id]);
+    }
+
+The final thing in this chapter is styling of our app, just add this to hero-detail.component.css
+
+    label {
+        display: inline-block;
+        width: 3em;
+        margin: .5em 0;
+        color: #607D8B;
+        font-weight: bold;
+    }
+    input {
+        height: 2em;
+        font-size: 1em;
+        padding-left: .4em;
+    }
+    button {
+        margin-top: 20px;
+        font-family: Arial;
+        background-color: #eee;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer; cursor: hand;
+    }
+    button:hover {
+        background-color: #cfd8dc;
+    }
+        button:disabled {
+        background-color: #eee;
+        color: #ccc; 
+        cursor: auto;
+    }
+
+Add some dashboard styling too.
+
+    [class*='col-'] {
+    float: left;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    }
+    [class*='col-']:last-of-type {
+    padding-right: 0;
+    }
+    a {
+    text-decoration: none;
+    }
+    *, *:after, *:before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    }
+    h3 {
+    text-align: center; margin-bottom: 0;
+    }
+    h4 {
+    position: relative;
+    }
+    .grid {
+    margin: 0;
+    }
+    .col-1-4 {
+    width: 25%;
+    }
+    .module {
+    padding: 20px;
+    text-align: center;
+    color: #eee;
+    max-height: 120px;
+    min-width: 120px;
+    background-color: #607D8B;
+    border-radius: 2px;
+    }
+    .module:hover {
+    background-color: #EEE;
+    cursor: pointer;
+    color: #607d8b;
+    }
+    .grid-pad {
+    padding: 10px 0;
+    }
+    .grid-pad > [class*='col-']:last-of-type {
+    padding-right: 20px;
+    }
+    @media (max-width: 600px) {
+    .module {
+        font-size: 10px;
+        max-height: 75px; }
+    }
+    @media (max-width: 1024px) {
+    .grid {
+        margin: 0;
+    }
+    .module {
+        min-width: 60px;
+    }
+    }
+
+And finally, add these to src/styles.css (global styles)
+
+    /* Master Styles */
+    h1 {
+    color: #369;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 250%;
+    }
+    h2, h3 {
+    color: #444;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: lighter;
+    }
+    body {
+    margin: 2em;
+    }
+    body, input[text], button {
+    color: #888;
+    font-family: Cambria, Georgia;
+    }
+    /* . . . */
+    /* everywhere else */
+    * {
+    font-family: Arial, Helvetica, sans-serif;
+    }
