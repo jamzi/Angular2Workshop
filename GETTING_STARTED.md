@@ -9,7 +9,8 @@ TABLE OF CONTENTS
 * [Multiple components](#multiple-components)
 * [Services](#services)
 * [Routing](#routing)
-* [HTTP](#http)
+* [HTTP-Promises](#http-promises)
+* [HTTP-Observables](#http-observables)
 
 ## SETTING UP ANGULAR 2
 ---------------------
@@ -459,7 +460,7 @@ And finally, add these to src/styles.css (global styles)
     font-family: Arial, Helvetica, sans-serif;
     }
 
-## HTTP
+## HTTP-Promises
 ---------------------
 
 We can provide HTTP services by adding HttpModule in our app.module.ts. Since we are using Angular-CLI, our http is already included and provided under imports.
@@ -623,3 +624,120 @@ Finally, we update the hero service with a delete method
             .then(() => null)
             .catch(this.handleError);
     }
+
+## HTTP-Observables
+---------------------
+
+Observables are HTTP response object, just another way to get data from our API.
+
+Let's add the hero search functionallity using observables. First, generate new hero-search service with angular-cli with: ng g service services/hero-search and add this service to the providers array in app.module.ts
+
+    import { Injectable } from '@angular/core';
+    import { Http, Response } from '@angular/http';
+    import { Observable } from 'rxjs';
+    import { Hero } from '../models/hero';
+
+    @Injectable()
+    export class HeroSearchService {
+        constructor(private http: Http) {}
+        search(term: string): Observable<Hero[]> {
+            return this.http
+                    .get(`app/heroes/?name=${term}`)
+                    .map((r: Response) => r.json().data as Hero[]);
+        }
+    }
+
+Notice that now, with search method, we don't convert it to promise, but return a observable instead.
+
+Now, lets generate a new component with: ng g component hero-search and copy below code to its .html file
+
+    <div id="search-component">
+        <h4>Hero Search</h4>
+        <input #searchBox id="search-box" (keyup)="search(searchBox.value)" />
+        <div>
+            <div *ngFor="let hero of heroes | async"
+                (click)="gotoDetail(hero)" class="search-result" >
+            {{hero.name}}
+            </div>
+        </div>
+    </div>
+
+Apply some styling and logic for search and gotoDetail (hero-search.component.css and hero-search.component.ts)
+
+    .search-result{
+        border-bottom: 1px solid gray;
+        border-left: 1px solid gray;
+        border-right: 1px solid gray;
+        width:195px;
+        height: 20px;
+        padding: 5px;
+        background-color: white;
+        cursor: pointer;
+    }
+    #search-box{
+        width: 200px;
+        height: 20px;
+    }
+
+    import { Component, OnInit } from '@angular/core';
+    import { Router } from '@angular/router';
+    import { Observable } from 'rxjs/Observable';
+    import { Subject } from 'rxjs/Subject';
+    import { HeroSearchService } from '../services/hero-search.service';
+    import { Hero } from '../models/hero';
+
+    @Component({
+    selector: 'app-hero-search',
+    templateUrl: './hero-search.component.html',
+    styleUrls: ['./hero-search.component.css'],
+    providers: [HeroSearchService]
+    })
+    export class HeroSearchComponent implements OnInit {
+    heroes: Observable<Hero[]>;
+    private searchTerms = new Subject<string>();
+    constructor(
+        private heroSearchService: HeroSearchService,
+        private router: Router) { }
+    // Push a search term into the observable stream.
+    search(term: string): void {
+        this.searchTerms.next(term);
+    }
+    ngOnInit(): void {
+        this.heroes = this.searchTerms
+        .debounceTime(300)        // wait for 300ms pause in events
+        .distinctUntilChanged()   // ignore if next search term is same as previous
+        .switchMap(term => term   // switch to new observable each time
+            // return the http search observable
+            ? this.heroSearchService.search(term)
+            // or the observable of empty heroes if no search term
+            : Observable.of<Hero[]>([]))
+        .catch(error => {
+            // TODO: real error handling
+            console.log(error);
+            return Observable.of<Hero[]>([]);
+        });
+    }
+    gotoDetail(hero: Hero): void {
+        let link = ['/detail', hero.id];
+        this.router.navigate(link);
+    }
+    }
+
+Add these rxjs operator import to the app.module.ts
+
+    // Observable class extensions
+    import 'rxjs/add/observable/of';
+    import 'rxjs/add/observable/throw';
+
+    // Observable operators
+    import 'rxjs/add/operator/catch';
+    import 'rxjs/add/operator/debounceTime';
+    import 'rxjs/add/operator/distinctUntilChanged';
+    import 'rxjs/add/operator/do';
+    import 'rxjs/add/operator/filter';
+    import 'rxjs/add/operator/map';
+    import 'rxjs/add/operator/switchMap';
+
+The last part of our search is to add search component to the dashboard under the list of top 4 heroes.
+
+    <app-hero-search></app-hero-search>
