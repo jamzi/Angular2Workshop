@@ -9,6 +9,7 @@ TABLE OF CONTENTS
 * [Multiple components](#multiple-components)
 * [Services](#services)
 * [Routing](#routing)
+* [HTTP](#http)
 
 ## SETTING UP ANGULAR 2
 ---------------------
@@ -456,4 +457,169 @@ And finally, add these to src/styles.css (global styles)
     /* everywhere else */
     * {
     font-family: Arial, Helvetica, sans-serif;
+    }
+
+## HTTP
+---------------------
+
+We can provide HTTP services by adding HttpModule in our app.module.ts. Since we are using Angular-CLI, our http is already included and provided under imports.
+
+Let's create a new in-memory service with ng g service services/in-memory-data and add createDb method and heroes data to it.
+
+Add this package in package.json under dependecies and run npm install.
+
+    "angular-in-memory-web-api": "0.1.13",
+
+In real example, we would be using a real API in the backend, but we will fake it with inmemory API module, so import these in the app.module.ts
+
+    import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
+    import { InMemoryDataService }  from './in-memory-data.service';
+
+
+    @NgModule({
+    imports: [
+        InMemoryWebApiModule.forRoot(InMemoryDataService),
+    ],
+
+in-memory-data.service.ts
+
+    import { InMemoryDbService } from 'angular-in-memory-web-api';
+  
+    export class InMemoryDataService implements InMemoryDbService {
+        createDb() {
+            let heroes = [
+            {id: 11, name: 'Mr. Nice'},
+            {id: 12, name: 'Narco'},
+            {id: 13, name: 'Bombasto'},
+            {id: 14, name: 'Celeritas'},
+            {id: 15, name: 'Magneta'},
+            {id: 16, name: 'RubberMan'},
+            {id: 17, name: 'Dynama'},
+            {id: 18, name: 'Dr IQ'},
+            {id: 19, name: 'Magma'},
+            {id: 20, name: 'Tornado'}
+            ];
+            return {heroes};
+        }
+    }
+
+Amazing work till now. We will now use HTTP in our hero service to get the heroes from our web api server.
+
+    import { Injectable } from '@angular/core';
+    import { Headers, Http } from '@angular/http';
+    import 'rxjs/add/operator/toPromise';
+    import { Hero } from './../models/hero';
+
+    private heroesUrl = 'api/heroes';  // URL to web api
+
+    constructor(private http: Http) { }
+
+    getHeroes(): Promise<Hero[]> {
+        return this.http.get(this.heroesUrl)
+                .toPromise()
+                .then(response => response.json().data as Hero[])
+                .catch(this.handleError);
+    }
+
+    private handleError(error: any): Promise<any> {
+        console.error('An error occurred', error); // for demo purposes only
+        return Promise.reject(error.message || error);
+    }
+
+Next, we will modify the method where we get the hero by id. For now, we are getting all the heroes from web api and extracting the right hero on the client. We want to get only one hero by id.
+
+    getHero(id: number): Promise<Hero> {
+        const url = `${this.heroesUrl}/${id}`;
+        return this.http.get(url)
+            .toPromise()
+            .then(response => response.json().data as Hero)
+            .catch(this.handleError);
+    }
+
+We want to create fully featured CRUD capable app, so we will first add the ability to save changed hero details. First add a save button with click handler and implement it in hero-detail component.
+
+    <button (click)="save()">Save</button>
+
+    save(): void {
+        this.heroService.update(this.hero)
+            .then(() => this.goBack());
+    }
+
+This update method on heroService does not exist yet, so open hero.service.ts and implement it.
+
+    private headers = new Headers({'Content-Type': 'application/json'});
+
+    update(hero: Hero): Promise<Hero> {
+        const url = `${this.heroesUrl}/${hero.id}`;
+        return this.http
+            .put(url, JSON.stringify(hero), {headers: this.headers})
+            .toPromise()
+            .then(() => hero)
+            .catch(this.handleError);
+    }
+
+We added headers to http request, because we are transfering json. We call the put method to update the entry.
+The R(read) and U(update) in CRUD are done. Now it is time to implement C(create) functionallity in our app. Let's add some input and button to our heroes.component.html on the top of the file.
+
+    <div>
+        <label>Hero name:</label> <input #heroName />
+        <button (click)="add(heroName.value); heroName.value=''">
+            Add
+        </button>
+    </div>
+
+Now in heroes.component.ts implement the add method, where we pass the value of input field.
+
+    add(name: string): void {
+        name = name.trim();
+        if (!name) { return; }
+            this.heroService.create(name)
+            .then(hero => {
+                this.heroes.push(hero);
+                this.selectedHero = null;
+            });
+    }
+
+Lastly, let's implement the missing create method in heroService.
+
+    create(name: string): Promise<Hero> {
+        return this.http
+            .post(this.heroesUrl, JSON.stringify({name: name}), {headers: this.headers})
+            .toPromise()
+            .then(res => res.json().data)
+            .catch(this.handleError);
+    }
+
+Delete is the last part of CRUD we are going to implement. Add this delete button after the hero name in heroes.component.html and styling to heroes.component.css
+
+    <button class="delete"
+        (click)="delete(hero); $event.stopPropagation()">x</button>
+
+    button.delete {
+        float:right;
+        margin-top: 2px;
+        margin-right: .8em;
+        background-color: gray !important;
+        color:white;
+    }
+
+The logic of delete method is implemented in heroes.component.ts
+
+    delete(hero: Hero): void {
+        this.heroService
+            .delete(hero.id)
+            .then(() => {
+                this.heroes = this.heroes.filter(h => h !== hero);
+                if (this.selectedHero === hero) { this.selectedHero = null; }
+            });
+        }
+
+Finally, we update the hero service with a delete method
+
+    delete(id: number): Promise<void> {
+        const url = `${this.heroesUrl}/${id}`;
+        return this.http.delete(url, {headers: this.headers})
+            .toPromise()
+            .then(() => null)
+            .catch(this.handleError);
     }
