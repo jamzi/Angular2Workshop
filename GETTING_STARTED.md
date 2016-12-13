@@ -201,7 +201,7 @@ Let's go to app.component.ts and consume this service.
 
     export class AppComponent implements OnInit{
         title = 'Tour of Heroes';
-        heroes = HEROES;
+        heroes: Hero[] = [];
         selectedHero: Hero;
 
         constructor(private heroService: HeroService) { }
@@ -255,7 +255,7 @@ Move the title of app in the app.component.html and add two links, to dashboard 
     </nav>
     <router-outlet></router-outlet>
 
-Create dashboard folder in /app and generate dashboard component with ng g component dashboard and add a title to dashboard.component.html. We will also display top 5 heroes here.
+Create dashboard folder in /app and generate dashboard component with ng g component dashboard and add a title to dashboard.component.html. We will also display top 4 heroes here.
 
     <h3>My Dashboard</h3>
     <h3>Top Heroes</h3>
@@ -321,20 +321,26 @@ When we are on the hero.detail view, we want to have an option to get back to th
         this.location.back();
     }
 
-We will modify heroes component too, so when you click on hero, you will be presented with a link which takes you to the hero detail component. Add this to heroes.component.html
-    
+We will modify heroes component too, so when you click on hero, you will be presented with a link which takes you to the hero detail component. 
+
+Delete this part in heroes.component.html
+
+    <app-hero-detail [hero]="selectedHero"></app-hero-detail>
+
+Add add this instead.
+
     <div *ngIf="selectedHero">
         <h2>
             {{selectedHero.name | uppercase}} is my hero
         </h2>
-        <button (click)="gotoDetail()">View Details</button>
+        <button (click)="goToDetail()">View Details</button>
     </div>
 
-Let's implement gotoDetail method in heroes.component.ts
+Let's implement goToDetail method in heroes.component.ts
 
     constructor(private heroService: HeroService, private router: Router) {}
 
-    gotoDetail(): void {
+    goToDetail(): void {
         this.router.navigate(['/detail', this.selectedHero.id]);
     }
 
@@ -656,13 +662,13 @@ Now, lets generate a new component with: ng g component hero-search and copy bel
         <input #searchBox id="search-box" (keyup)="search(searchBox.value)" />
         <div>
             <div *ngFor="let hero of heroes | async"
-                (click)="gotoDetail(hero)" class="search-result" >
+                (click)="goToDetail(hero)" class="search-result" >
             {{hero.name}}
             </div>
         </div>
     </div>
 
-Apply some styling and logic for search and gotoDetail (hero-search.component.css and hero-search.component.ts)
+Apply some styling and logic for search and goToDetail (hero-search.component.css and hero-search.component.ts)
 
     .search-result{
         border-bottom: 1px solid gray;
@@ -717,7 +723,7 @@ Apply some styling and logic for search and gotoDetail (hero-search.component.cs
             return Observable.of<Hero[]>([]);
         });
     }
-    gotoDetail(hero: Hero): void {
+    goToDetail(hero: Hero): void {
         let link = ['/detail', hero.id];
         this.router.navigate(link);
     }
