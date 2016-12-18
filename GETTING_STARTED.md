@@ -236,22 +236,22 @@ Meanwhile, copy the .css from app.component.css to heroes.component.css.
 
 Also, move all the variables and methods from .ts file to heroes.component.ts file, because we will need them there to display the heroes. Also delete the OnInit implements, because we are not using it anymore in app.component.ts.
 
-  selectedHero: Hero;
-  heroes: Hero[];
+    selectedHero: Hero;
+    heroes: Hero[];
 
-  constructor(private heroService: HeroService){}
+    constructor(private heroService: HeroService){}
 
-  onSelect(hero: Hero){
-    this.selectedHero = hero;
-  }
+    onSelect(hero: Hero){
+        this.selectedHero = hero;
+    }
 
-  ngOnInit(): void {
-    this.getHeroes();
-  }
+    ngOnInit(): void {
+        this.getHeroes();
+    }
 
-  getHeroes(): void {
-    this.heroService.getHeroes().then(heroes => this.heroes = heroes);
-  }
+    getHeroes(): void {
+        this.heroService.getHeroes().then(heroes => this.heroes = heroes);
+    }
 
 Let's create separate module for routing in the app/routing.module.ts (create new .ts file). Open app.module.ts and add routing module to imports array and copy content below to routing.module.ts.
 
