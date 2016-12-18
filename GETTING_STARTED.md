@@ -222,11 +222,38 @@ Let's go to app.component.ts and consume this service.
 ## ROUTING
 ---------------------
 
-Rename app.component.* to heroes.component.* and move these files in /heroes folder. In heroes.component.ts change name HeroesComponent and fix imports (path should be one more folder back). Then navigate to app.module.ts and rename app -> heroes and fix paths.
+Create new Heroes component with ng g component heroes . We will move our heroes list to this component. Go to app.component.html and move everything to heroes template (.html file). 
 
-Create new AppComponent with ng g component app in the /app folder. Move files from /app/app to /app and fix the app.module.ts path for app.component.ts.
+    <h2>My Heroes</h2>
+    <ul class="heroes">
+        <li *ngFor="let hero of heroes" (click)="onSelect(hero)" [class.selected]="hero === selectedHero">
+            <span class="badge">{{hero.id}}</span>{{hero.name}}
+        </li>
+    </ul>
+    <app-hero-detail [hero]="selectedHero"></app-hero-detail>
 
-Let's create separate module for routing in the app/routing.module.ts. Open app.module.ts and add routing module to imports array and copy content below to routing.module.ts.
+Meanwhile, copy the .css from app.component.css to heroes.component.css.
+
+Also, move all the variables and methods from .ts file to heroes.component.ts file, because we will need them there to display the heroes. Also delete the OnInit implements, because we are not using it anymore in app.component.ts.
+
+  selectedHero: Hero;
+  heroes: Hero[];
+
+  constructor(private heroService: HeroService){}
+
+  onSelect(hero: Hero){
+    this.selectedHero = hero;
+  }
+
+  ngOnInit(): void {
+    this.getHeroes();
+  }
+
+  getHeroes(): void {
+    this.heroService.getHeroes().then(heroes => this.heroes = heroes);
+  }
+
+Let's create separate module for routing in the app/routing.module.ts (create new .ts file). Open app.module.ts and add routing module to imports array and copy content below to routing.module.ts.
 
     import { NgModule } from '@angular/core';
     import { RouterModule, Routes } from '@angular/router';
@@ -280,12 +307,7 @@ We will now implement logic for top heroes. Open dashboard.component.ts and add.
 
 Try to run ng serve and you should be able to navigate between two routes /dashboard, /heroes
 
-We will now set up the navigation to specific hero with passing the hero id as a number in the params. Add this to your hero-detail.component.ts
-  
-    @Input()
-    hero: Hero;
-
-We implement the ngOnInit and get the data from params on the component init.
+We will now set up the navigation to specific hero with passing the hero id as a number in the params. Implement the ngOnInit and get the data from params on the component init.
 
     import { HeroService } from './../services/hero.service';
     import { Hero } from './../models/hero';
@@ -480,7 +502,7 @@ Add this package in package.json under dependecies and run npm install.
 In real example, we would be using a real API in the backend, but we will fake it with inmemory API module, so import these in the app.module.ts
 
     import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
-    import { InMemoryDataService }  from './in-memory-data.service';
+    import { InMemoryDataService } from './services/in-memory-data.service';
 
 
     @NgModule({
