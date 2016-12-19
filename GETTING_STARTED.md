@@ -307,7 +307,7 @@ We will now implement logic for top heroes. Open dashboard.component.ts and add.
 
 Try to run ng serve and you should be able to navigate between two routes /dashboard, /heroes
 
-We will now set up the navigation to specific hero with passing the hero id as a number in the params. Implement the ngOnInit and get the data from params on the component init.
+We will now set up the navigation to specific hero with passing the hero id as a number in the params. Implement the ngOnInit and get the data from params on the component init in the hero-detail.component.ts.
 
     import { HeroService } from './../services/hero.service';
     import { Hero } from './../models/hero';
