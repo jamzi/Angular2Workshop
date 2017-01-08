@@ -7,6 +7,10 @@ import { HeroDetailComponent } from './hero-detail/hero-detail.component';
 
 const routes: Routes = [
   {
+    path: '',
+    component: DashboardComponent
+  },
+  {
     path: 'heroes',
     component: HeroesComponent
   },
