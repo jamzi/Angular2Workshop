@@ -13,6 +13,8 @@ before_script:
   - npm install -g angular-cli
 
 script:
+  - echo 'running ls'
+  - ls
   - ng build --prod
 
 after_success:
