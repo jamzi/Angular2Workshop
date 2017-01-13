@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/jamzi/Angular2Workshop.svg?branch=master)](https://travis-ci.org/jamzi/Angular2Workshop)
+<p><a href="https://angular2workshop.firebaseapp.com/">View App</a></p>
+
 # Angular2 workshop
 Angular 2 Tour of heroes sample for FRI Garaza hands-on workshop
 
