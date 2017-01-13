@@ -13,7 +13,6 @@ before_script:
   - npm install -g angular-cli
 
 script:
-  - cd Angular2Workshop
   - ng build --prod
 
 after_success:
