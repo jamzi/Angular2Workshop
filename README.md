@@ -1,9 +1,9 @@
 [![Build Status](https://travis-ci.org/jamzi/Angular2Workshop.svg?branch=master)](https://travis-ci.org/jamzi/Angular2Workshop)
+[![Greenkeeper badge](https://badges.greenkeeper.io/jamzi/Angular2Workshop.svg)](https://greenkeeper.io/)
 <p><a href="https://angular2workshop.firebaseapp.com/">View App</a></p>
 
 # Angular2 workshop
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/jamzi/Angular2Workshop.svg)](https://greenkeeper.io/)
 Angular 2 Tour of heroes sample for FRI Garaza hands-on workshop
 
 * Angular 2 presentation (english) [here](https://docs.google.com/presentation/d/1b_LakxG8837AF5oQTYRvpS8kE3bIryg8LwYk3i-tUhI/edit?usp=sharing)  
