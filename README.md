@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/jamzi/Angular2Workshop.svg?branch=master)](https://travis-ci.org/jamzi/Angular2Workshop)
-[![Greenkeeper badge](https://badges.greenkeeper.io/jamzi/Angular2Workshop.svg)](https://greenkeeper.io/)
+
 <p><a href="https://angular2workshop.firebaseapp.com/">View App</a></p>
 
 # Angular2 workshop
