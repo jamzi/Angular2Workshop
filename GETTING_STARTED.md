@@ -15,7 +15,7 @@ TABLE OF CONTENTS
 ## SETTING UP ANGULAR 2
 ---------------------
 * [NodeJS](https://nodejs.org/en/)
-* npm install -g angular-cli
+* npm install -g @angular/cli
 * ng new Angular2Workshop
 * cd Angular2Workshop
 * ng serve
@@ -491,7 +491,7 @@ And finally, add these to src/styles.css (global styles)
 ## HTTP-Promises
 ---------------------
 
-We can provide HTTP services by adding HttpModule in our app.module.ts. Since we are using Angular-CLI, our http is already included and provided under imports.
+We can provide HTTP services by adding HttpModule in our app.module.ts. Since we are using Angular CLI, our http is already included and provided under imports.
 
 Let's create a new in-memory service with ng g service services/in-memory-data and add createDb method and heroes data to it.
 
@@ -658,7 +658,7 @@ Finally, we update the hero service with a delete method
 
 Observables are HTTP response objects, just another way to get data from our API.
 
-Let's add the hero search functionallity using observables. First, generate new hero-search service with angular-cli with: ng g service services/hero-search and add this service to the providers array in app.module.ts
+Let's add the hero search functionallity using observables. First, generate new hero-search service with Angular CLI with: ng g service services/hero-search and add this service to the providers array in app.module.ts
 
     import { Injectable } from '@angular/core';
     import { Http, Response } from '@angular/http';
