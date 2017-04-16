@@ -1,9 +1,9 @@
-Getting started with Angular 2
+Getting started with Angular
 ====================
 
 TABLE OF CONTENTS
 ---------------------
-* [Setting up Angular 2](#setting-up-angular-2)
+* [Setting up Angular](#setting-up-angular)
 * [Introduction](#introduction)
 * [Adding more heroes](#adding-more-heroes)
 * [Multiple components](#multiple-components)
@@ -12,7 +12,7 @@ TABLE OF CONTENTS
 * [HTTP-Promises](#http-promises)
 * [HTTP-Observables](#http-observables)
 
-## SETTING UP ANGULAR 2
+## SETTING UP ANGULAR
 ---------------------
 * [NodeJS](https://nodejs.org/en/)
 * npm install -g @angular/cli
