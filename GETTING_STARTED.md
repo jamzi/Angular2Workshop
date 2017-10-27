@@ -546,7 +546,7 @@ Amazing work till now. We will now use HTTP in our hero service to get the heroe
     getHeroes(): Promise<Hero[]> {
         return this.http.get(this.heroesUrl)
                 .toPromise()
-                .then(response => response.json().data as Hero[])
+                .then(response => response.json() as Hero[])
                 .catch(this.handleError);
     }
 
@@ -561,7 +561,7 @@ Next, we will modify the method where we get the hero by id. For now, we are get
         const url = `${this.heroesUrl}/${id}`;
         return this.http.get(url)
             .toPromise()
-            .then(response => response.json().data as Hero)
+            .then(response => response.json() as Hero)
             .catch(this.handleError);
     }
 
@@ -615,7 +615,7 @@ Lastly, let's implement the missing create method in heroService.
         return this.http
             .post(this.heroesUrl, JSON.stringify({name: name}), {headers: this.headers})
             .toPromise()
-            .then(res => res.json().data)
+            .then(res => res.json())
             .catch(this.handleError);
     }
 
@@ -663,6 +663,9 @@ Let's add the hero search functionallity using observables. First, generate new 
     import { Injectable } from '@angular/core';
     import { Http, Response } from '@angular/http';
     import { Observable } from 'rxjs';
+
+    import 'rxjs/add/operator/map';
+    
     import { Hero } from '../models/hero';
 
     @Injectable()
@@ -671,7 +674,7 @@ Let's add the hero search functionallity using observables. First, generate new 
         search(term: string): Observable<Hero[]> {
             return this.http
                     .get(`app/heroes/?name=${term}`)
-                    .map((r: Response) => r.json().data as Hero[]);
+                    .map((r: Response) => r.json() as Hero[]);
         }
     }
 
@@ -714,8 +717,16 @@ Add logic for search and goToDetail (hero-search.component.ts).
     import { Router } from '@angular/router';
     import { Observable } from 'rxjs/Observable';
     import { Subject } from 'rxjs/Subject';
+
+    import 'rxjs/add/observable/of';
+    import 'rxjs/add/operator/catch';
+    import 'rxjs/add/operator/debounceTime';
+    import 'rxjs/add/operator/distinctUntilChanged';
+
     import { HeroSearchService } from '../services/hero-search.service';
     import { Hero } from '../models/hero';
+
+    import 'rxjs/add/operator/debounceTime';
 
     @Component({
         selector: 'app-hero-search',
